@@ -2,3 +2,4 @@ obj_dir
 dump.vcd
 *.gtkw
 model.log
+test

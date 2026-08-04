@@ -12,7 +12,7 @@ module tb ();
   logic                       rstn;
 
   top i_top (
-      .clk_i(clk),
+      .clk(clk),
       .rstn_i(rstn),
       .addr_i(addr),
       .update_o(update),
@@ -30,8 +30,6 @@ module tb ();
     file_pointer = $fopen("model.log", "w");
     #4
     forever begin
-      @(posedge clk);
-
       if (update) begin
         if (reg_addr == 0) begin
           $fdisplay(file_pointer, "0x%8h (0x%8h)", pc, instr);
