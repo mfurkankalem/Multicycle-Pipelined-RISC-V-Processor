@@ -66,7 +66,19 @@ branch branch_0(.alu_rd(alu_rd), .e_rd(e_rd_eo), .program_counter(prog_cnt_eo),
 .op(inst_eo[6:0]), .funct3(inst_eo[14:12]), .branch_rd(branch_rd));
 
 
-  always_ff @(posedge clk) begin 
+ctrl_e ctrl_bits_mo;
+logic [XLEN-1:0] demux2_out1_mo, demux2_out2_mo, branch_rd_mo, demux1_out1_mo, 
+inst_mo, pc_mo, prog_mo;
+
+clk_memory clk_memory_0 (.clk(clk), .ctrl_bits_mi(ctrl_bits_eo), 
+.demux2_out1_mi(demux2_out1), .demux2_out2_mi(demux2_out2), .branch_rd_mi(branch_rd), 
+.demux1_out1_mi(demux1_out1), .inst_mi(inst_eo), .pc_mi(pc_eo), 
+.prog_cnt_mi(prog_cnt_eo), .ctrl_bits_mo(ctrl_bits_mo), 
+.demux2_out1_mo(demux2_out1_mo), .demux2_out2_mo(demux2_out2_mo), 
+.branch_rd_mo(branch_rd_mo), .demux1_out1_mo(demux1_out1_mo), 
+.inst_mo(inst_mo), .pc_mo(pc_mo), .prog_mo(prog_mo));
+
+  always_ff @(posedge clk) begin
     update_o   <= ~(update_o);
   end
 
