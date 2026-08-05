@@ -50,7 +50,7 @@ module tb ();
 
   initial begin
     rstn = 0;
-    #4;
+    #2;
     rstn = 1;
     #10000;
     for (int i = 0; i < 10; i++) begin

@@ -17,6 +17,62 @@
 
 package riscv_pkg;
 
+  localparam CTRLB_LEN     = 4'd11;
+  localparam CTRLB_PC_MSB  = 4'd10;
+  localparam CTRLB_PC_LSB  = 4'd9;
+  localparam CTRLB_R       = 4'd8;
+  localparam CTRLB_M1      = 4'd7;
+  localparam CTRLB_M2_MSB  = 4'd6;
+  localparam CTRLB_M2_LSB  = 4'd5;
+  localparam CTRLB_M3      = 4'd4;
+  localparam CTRLB_D1      = 4'd3;
+  localparam CTRLB_D2_MSB  = 4'd2;
+  localparam CTRLB_D2_LSB  = 4'd1;
+  localparam CTRLB_DM      = 4'd0;
+
+  typedef enum logic [3:0] {
+      ALU_ADD   = 4'b0000,
+      ALU_SUB   = 4'b0001,
+      ALU_AND   = 4'b0010,
+      ALU_OR    = 4'b0011,
+      ALU_XOR   = 4'b0100,
+      ALU_SLL   = 4'b0101,
+      ALU_SRL   = 4'b0110,
+      ALU_SRA   = 4'b0111,
+      ALU_SLT   = 4'b1000,
+      ALU_SLTU  = 4'b1001,
+      ALU_NONE  = 4'b1111
+  } alu_op_e;
+
+  typedef enum logic [2:0] {
+      IMM_NONE = 3'b000,   // R-type: no immediate
+      IMM_I    = 3'b001,   // I-type operations
+      IMM_J    = 3'b010,   // J-type operations
+      IMM_U    = 3'b011,   // U-type operations
+      IMM_S    = 3'b100,   // S-type operations
+      IMM_B    = 3'b101    // B-type operations
+  } imm_src_e;
+
+  //pc_cd, r_cd, m_cd1, m_cd2, m_cd3, d_cd1, d_cd2, dm_cd
+  typedef enum logic [CTRLB_LEN-1:0] {
+      CTRL_REG_WRITE   = 'b00_1_0_00_1_0_01_0,   // add, sub
+      CTRL_REG_WRITE_I = 'b00_1_1_00_1_0_01_0,   // addi
+      CTRL_JUMP_LINK   = 'b01_1_0_10_1_0_01_0,   // jal
+      CTRL_JALR        = 'b10_1_1_10_1_0_10_0,   // jalr
+      CTRL_BRANCH      = 'b11_0_0_00_1_0_11_0,   // branch
+      CTRL_AUIPC       = 'b00_1_1_00_0_0_01_0,   // auipc 
+      CTRL_LOAD        = 'b00_1_1_01_1_0_00_0,   // lw
+      CTRL_STORE       = 'b00_0_1_00_1_1_00_1,   // sw
+      CTRL_NONE        = 'b00_0_1_00_1_0_01_0
+  } ctrl_e;
+
+  typedef enum logic [1:0] {
+      PC_NONE   = 2'b00,   
+      PC_JAL    = 2'b01,   
+      PC_JALR   = 2'b10,
+      PC_BRANCH = 2'b11 
+  } pc_e;
+
   // ----------------------
   // Import cva6 config from cva6_config_pkg
   // ----------------------

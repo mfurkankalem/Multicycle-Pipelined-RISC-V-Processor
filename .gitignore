@@ -3,3 +3,4 @@ dump.vcd
 *.gtkw
 model.log
 test
+dump.sv
