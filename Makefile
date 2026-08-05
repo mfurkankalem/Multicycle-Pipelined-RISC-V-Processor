@@ -1,4 +1,4 @@
-SV_FILES = ${wildcard ./src/pkg/*.sv} ${wildcard ./src/*.sv} ${wildcard ./src/clk/*.sv}
+SV_FILES = ${wildcard ./src/pkg/*.sv} ${wildcard ./src/*.sv} ${wildcard ./src/clk/*.sv} ${wildcard ./src/mux/*.sv}
 TB_FILES = ${wildcard ./tb/*.sv}
 ALL_FILES = ${SV_FILES} ${TB_FILES}
 

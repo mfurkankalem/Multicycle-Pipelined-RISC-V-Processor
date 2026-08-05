@@ -43,15 +43,28 @@ control c_0(.op(inst_do[6:0]), .funct3(inst_do[14:12]), .funct7(inst_do[31:25]),
 .e_cd(e_cd), .alu_cd(alu_cd), .ctrl_bits(ctrl_bits));
 
 
+logic [XLEN-1:0] r_rd1_eo, r_rd2_eo, e_rd_eo, inst_eo, pc_eo, prog_cnt_eo;
 ctrl_e ctrl_bits_eo; 
 logic [3:0] alu_cd_eo; 
-logic [XLEN-1:0] r_rd1_eo, r_rd2_eo, e_rd_eo, inst_eo, pc_eo, prog_cnt_eo;
+logic [XLEN-1:0] alu_a, alu_b, alu_rd, branch_rd;
+logic [XLEN-1:0] demux1_out1, demux1_out2, demux2_out1, demux2_out2, demux2_out3;
+logic [XLEN-1:0] empty;
 
 clk_execute clk_execute_0 (.clk(clk), .ctrl_bits_ei(ctrl_bits), .alu_cd_ei(alu_cd), 
 .r_rd1_ei(r_rd1), .r_rd2_ei(r_rd2), .e_rd_ei(e_rd), .inst_ei(inst_do), 
 .pc_ei(pc_do), .prog_cnt_ei(prog_cnt_do), .ctrl_bits_eo(ctrl_bits_eo), 
 .alu_cd_eo(alu_cd_eo), .r_rd1_eo(r_rd1_eo), .r_rd2_eo(r_rd2_eo), .e_rd_eo(e_rd_eo), 
 .inst_eo(inst_eo), .pc_eo(pc_eo), .prog_cnt_eo(prog_cnt_eo));
+
+mux mux_3 (.a1(pc_eo), .a2(r_rd1_eo), .m_cd(ctrl_bits_eo[CTRLB_M3]), .m_rd(alu_a));
+demux demux_1 (.a1(r_rd2_eo), .d_cd(ctrl_bits_eo[CTRLB_D1]), .rd1(demux1_out1), .rd2(demux1_out2));
+mux mux_1 (.a1(demux1_out1), .a2(e_rd_eo), .m_cd(ctrl_bits_eo[CTRLB_M1]), .m_rd(alu_b));
+ALU alu_0(.alu_a(alu_a), .alu_b(alu_b), .alu_cd(alu_cd_eo), .alu_rd(alu_rd));
+demux_2b demux_2 (.a1(alu_rd), .d_cd(ctrl_bits_eo[CTRLB_D2_MSB:CTRLB_D2_LSB]), 
+.rd1(demux2_out1), .rd2(demux2_out2), .rd3(demux2_out3), .rd4(empty));
+branch branch_0(.alu_rd(alu_rd), .e_rd(e_rd_eo), .program_counter(prog_cnt_eo),
+.op(inst_eo[6:0]), .funct3(inst_eo[14:12]), .branch_rd(branch_rd));
+
 
   always_ff @(posedge clk) begin 
     update_o   <= ~(update_o);
