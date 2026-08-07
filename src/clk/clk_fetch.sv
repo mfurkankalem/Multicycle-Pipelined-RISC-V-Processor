@@ -10,7 +10,7 @@ module clk_fetch import riscv_pkg::*; (
     if (rstn_i)
       pc_fo <= pc_fi;
     else
-      pc_fo <= 32'h80000000;
+      pc_fo <= INST_START;
   end
 
 endmodule

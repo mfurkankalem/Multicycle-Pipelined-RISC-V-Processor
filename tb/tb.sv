@@ -28,7 +28,7 @@ module tb ();
   integer file_pointer;
   initial begin
     file_pointer = $fopen("model.log", "w");
-    #4
+    #3
     forever begin
       if (update) begin
         if (reg_addr == 0) begin
@@ -40,8 +40,8 @@ module tb ();
             $fdisplay(file_pointer, "0x%8h (0x%8h) x%0d  0x%8h", pc, instr, reg_addr, reg_data);
           end
         end
-        #2;
       end
+      #2;
     end
   end
 

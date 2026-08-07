@@ -17,6 +17,8 @@
 
 package riscv_pkg;
 
+  localparam INST_START    = 32'h80000000;
+
   localparam CTRLB_LEN     = 4'd11;
   localparam CTRLB_PC_MSB  = 4'd10;
   localparam CTRLB_PC_LSB  = 4'd9;
