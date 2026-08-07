@@ -14,7 +14,7 @@ module top import riscv_pkg::*;
     output logic  [     4:0] reg_addr_o,  // log register address
     output logic  [XLEN-1:0] reg_data_o,  // log register data
     output logic  [XLEN-1:0] mem_addr_o,  // retired memory address
-    output logic  [XLEN-1:0] data_o,      // data memory write
+    output logic  [XLEN-1:0] data_o [0:XLEN-1], // data memory write
     output logic  [XLEN-1:0] mem_data_o   // retired memory data              //imem için kullanılacak
     
 );
@@ -65,18 +65,18 @@ branch branch_0(.alu_rd(alu_rd), .e_rd(e_rd_eo), .program_counter(prog_cnt_eo),
 
 
 ctrl_e ctrl_bits_mo;
-logic [XLEN-1:0] demux2_out1_mo, demux2_out2_mo, branch_rd_mo, demux1_out1_mo, 
+logic [XLEN-1:0] demux2_out1_mo, demux2_out2_mo, branch_rd_mo, demux1_out2_mo, 
 inst_mo, pc_mo, prog_mo, dm_rd;
 
 clk_memory clk_memory_0 (.clk(clk), .ctrl_bits_mi(ctrl_bits_eo), 
 .demux2_out1_mi(demux2_out1), .demux2_out2_mi(demux2_out2), .branch_rd_mi(branch_rd), 
-.demux1_out1_mi(demux1_out1), .inst_mi(inst_eo), .pc_mi(pc_eo), 
+.demux1_out2_mi(demux1_out2), .inst_mi(inst_eo), .pc_mi(pc_eo), 
 .prog_cnt_mi(prog_cnt_eo), .ctrl_bits_mo(ctrl_bits_mo), 
 .demux2_out1_mo(demux2_out1_mo), .demux2_out2_mo(demux2_out2_mo), 
-.branch_rd_mo(branch_rd_mo), .demux1_out1_mo(demux1_out1_mo), 
+.branch_rd_mo(branch_rd_mo), .demux1_out2_mo(demux1_out2_mo), 
 .inst_mo(inst_mo), .pc_mo(pc_mo), .prog_mo(prog_mo));
 data_memory m_data(.clk(clk), .dm_cd(ctrl_bits_mo[CTRLB_DM]), .dm_a(demux2_out1_mo), 
-.dm_wd (demux1_out1_mo), .dm_rd(dm_rd));
+.data_dm(data_o), .dm_wd (demux1_out2_mo), .dm_rd(dm_rd));
 
 
 ctrl_e ctrl_bits_wo;
@@ -98,7 +98,6 @@ mux_2b mux_2 (.a1(demux2_out2_wo), .a2(dm_rd_wo), .a3(prog_wo),
       update_o   = 0;
   end
 
-  assign data_o     = dm_rd_wo;
   assign pc_o       = pc_wo;
   assign instr_o    = inst_wo;
   assign reg_addr_o = (inst_wo[11:7]);

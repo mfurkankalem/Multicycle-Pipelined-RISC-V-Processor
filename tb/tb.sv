@@ -1,6 +1,6 @@
 module tb ();
   logic [riscv_pkg::XLEN-1:0] addr;
-  logic [riscv_pkg::XLEN-1:0] data;
+  logic [riscv_pkg::XLEN-1:0] data [0:riscv_pkg::XLEN-1];  
   logic [riscv_pkg::XLEN-1:0] pc;
   logic [riscv_pkg::XLEN-1:0] instr;
   logic [                4:0] reg_addr;
@@ -28,7 +28,7 @@ module tb ();
   integer file_pointer;
   initial begin
     file_pointer = $fopen("model.log", "w");
-    #3
+    #1
     forever begin
       if (update) begin
         if (reg_addr == 0) begin
@@ -55,7 +55,7 @@ module tb ();
     #10000;
     for (int i = 0; i < 10; i++) begin
       addr = i;
-      $display("data @ mem[0x%8h] = %8h", addr, data);
+      $display("data @ mem[0x%8h] = %8h", addr, data[addr]);
     end
     $finish;
   end
