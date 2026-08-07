@@ -19,9 +19,30 @@ module top import riscv_pkg::*;
     
 );
 
+logic en_f, en_d, en_e, en_m, en_w;
+logic [4:0] en_shift;
+
+always_ff @(posedge clk) begin
+    if (!rstn_i) begin
+        en_shift <= 5'b00001;
+    end else if (en_shift == 5'b10000) begin 
+        en_shift <= 5'b00001;
+    end else begin
+        en_shift <= (en_shift << 1);
+    end
+end
+
+assign en_f = en_shift[0]; 
+assign en_d = en_shift[1]; 
+assign en_e = en_shift[2]; 
+assign en_m = en_shift[3]; 
+assign en_w = en_shift[4]; 
+
+
 logic [XLEN-1:0] pc_fi, pc_fo, im_rd, pc_p;
 
-clk_fetch clk_fetch_0(.clk(clk), .rstn_i(rstn_i), .pc_fi(branch_rd_wo), .pc_fo(pc_fo));
+clk_fetch clk_fetch_0(.clk(clk), .en_f(en_f), .rstn_i(rstn_i), 
+.pc_fi(branch_rd_wo), .pc_fo(pc_fo));
 prog_cnt prog_cnt_0(.prog_cnt_i(pc_fo), .prog_cnt_o(pc_p));
 instruction_memory instruction_memory_0(.im_a(pc_fo), .im_rd(im_rd));
 
@@ -33,7 +54,7 @@ logic [2:0] e_cd;
 logic [3:0] alu_cd;
 
 clk_decode clk_decode_0(.clk(clk), .inst_di(im_rd), .pc_di(pc_fo), .prog_cnt_di(pc_p),
-.inst_do(inst_do), .pc_do(pc_do), .prog_cnt_do(prog_cnt_do));
+.inst_do(inst_do), .pc_do(pc_do), .prog_cnt_do(prog_cnt_do), .en_d(en_d));
 register r_0(.clk(clk), .r_cd(ctrl_bits_wo[CTRLB_R]), .r_a1(inst_do[19:15]), .r_a2(inst_do[24:20]), 
 .r_a3(inst_wo[11:7]), .r_wd3(r_wd3), .r_rd1(r_rd1), .r_rd2(r_rd2));
 extender e_0(.e_a(inst_do[31:7]), .e_cd(e_cd), .e_rd(e_rd));
@@ -48,9 +69,9 @@ logic [XLEN-1:0] alu_a, alu_b, alu_rd, branch_rd;
 logic [XLEN-1:0] demux1_out1, demux1_out2, demux2_out1, demux2_out2, demux2_out3;
 logic [XLEN-1:0] empty;
 
-clk_execute clk_execute_0 (.clk(clk), .ctrl_bits_ei(ctrl_bits), .alu_cd_ei(alu_cd), 
-.r_rd1_ei(r_rd1), .r_rd2_ei(r_rd2), .e_rd_ei(e_rd), .inst_ei(inst_do), 
-.pc_ei(pc_do), .prog_cnt_ei(prog_cnt_do), .ctrl_bits_eo(ctrl_bits_eo), 
+clk_execute clk_execute_0 (.clk(clk), .en_e(en_e), .ctrl_bits_ei(ctrl_bits), 
+.alu_cd_ei(alu_cd), .r_rd1_ei(r_rd1), .r_rd2_ei(r_rd2), .e_rd_ei(e_rd), 
+.inst_ei(inst_do),  .pc_ei(pc_do), .prog_cnt_ei(prog_cnt_do), .ctrl_bits_eo(ctrl_bits_eo), 
 .alu_cd_eo(alu_cd_eo), .r_rd1_eo(r_rd1_eo), .r_rd2_eo(r_rd2_eo), .e_rd_eo(e_rd_eo), 
 .inst_eo(inst_eo), .pc_eo(pc_eo), .prog_cnt_eo(prog_cnt_eo));
 
@@ -68,7 +89,7 @@ ctrl_e ctrl_bits_mo;
 logic [XLEN-1:0] demux2_out1_mo, demux2_out2_mo, branch_rd_mo, demux1_out2_mo, 
 inst_mo, pc_mo, prog_mo, dm_rd;
 
-clk_memory clk_memory_0 (.clk(clk), .ctrl_bits_mi(ctrl_bits_eo), 
+clk_memory clk_memory_0 (.clk(clk), .en_m(en_m), .ctrl_bits_mi(ctrl_bits_eo), 
 .demux2_out1_mi(demux2_out1), .demux2_out2_mi(demux2_out2), .branch_rd_mi(branch_rd), 
 .demux1_out2_mi(demux1_out2), .inst_mi(inst_eo), .pc_mi(pc_eo), 
 .prog_cnt_mi(prog_cnt_eo), .ctrl_bits_mo(ctrl_bits_mo), 
@@ -82,7 +103,7 @@ data_memory m_data(.clk(clk), .dm_cd(ctrl_bits_mo[CTRLB_DM]), .dm_a(demux2_out1_
 ctrl_e ctrl_bits_wo;
 logic [XLEN-1:0] branch_rd_wo, dm_rd_wo, demux2_out2_wo, inst_wo, pc_wo, prog_wo;
 
-clk_writeback clk_writeback_0 (.clk(clk), .ctrl_bits_wi(ctrl_bits_mo), 
+clk_writeback clk_writeback_0 (.clk(clk), .en_w(en_w), .ctrl_bits_wi(ctrl_bits_mo), 
 .branch_rd_wi(branch_rd_mo), .dm_rd_wi(dm_rd), .demux2_out2_wi(demux2_out2_mo), 
 .inst_wi(inst_mo), .pc_wi(pc_mo), .prog_cnt_wi(prog_mo), .ctrl_bits_wo(ctrl_bits_wo), 
 .branch_rd_wo(branch_rd_wo), .dm_rd_wo(dm_rd_wo), .demux2_out2_wo(demux2_out2_wo), 
