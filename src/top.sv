@@ -68,7 +68,7 @@ branch branch_0(.alu_rd(alu_rd), .e_rd(e_rd_eo), .program_counter(prog_cnt_eo),
 
 ctrl_e ctrl_bits_mo;
 logic [XLEN-1:0] demux2_out1_mo, demux2_out2_mo, branch_rd_mo, demux1_out1_mo, 
-inst_mo, pc_mo, prog_mo;
+inst_mo, pc_mo, prog_mo, dm_rd;
 
 clk_memory clk_memory_0 (.clk(clk), .ctrl_bits_mi(ctrl_bits_eo), 
 .demux2_out1_mi(demux2_out1), .demux2_out2_mi(demux2_out2), .branch_rd_mi(branch_rd), 
@@ -77,6 +77,19 @@ clk_memory clk_memory_0 (.clk(clk), .ctrl_bits_mi(ctrl_bits_eo),
 .demux2_out1_mo(demux2_out1_mo), .demux2_out2_mo(demux2_out2_mo), 
 .branch_rd_mo(branch_rd_mo), .demux1_out1_mo(demux1_out1_mo), 
 .inst_mo(inst_mo), .pc_mo(pc_mo), .prog_mo(prog_mo));
+data_memory m_data(.clk(clk), .dm_cd(ctrl_bits_mo[CTRLB_DM]), .dm_a(demux2_out1_mo), 
+.dm_wd (demux1_out1_mo), .dm_rd(dm_rd));
+
+
+ctrl_e ctrl_bits_wo;
+logic [XLEN-1:0] branch_rd_wo, dm_rd_wo, demux2_out2_wo, inst_wo, pc_wo, prog_wo;
+
+clk_writeback clk_writeback_0 (.clk(clk), .ctrl_bits_wi(ctrl_bits_mo), 
+.branch_rd_wi(branch_rd_mo), .dm_rd_wi(dm_rd), .demux2_out2_wi(demux2_out2_mo), 
+.inst_wi(inst_mo), .pc_wi(pc_mo), .prog_cnt_wi(prog_mo), .ctrl_bits_wo(ctrl_bits_wo), 
+.branch_rd_wo(branch_rd_wo), .dm_rd_wo(dm_rd_wo), .demux2_out2_wo(demux2_out2_wo), 
+.inst_wo(inst_wo), .pc_wo(pc_wo), .prog_wo(prog_wo));
+
 
   always_ff @(posedge clk) begin
     update_o   <= ~(update_o);

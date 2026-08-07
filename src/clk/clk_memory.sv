@@ -20,3 +20,4 @@ module clk_memory import riscv_pkg::*; (
     end
 
 endmodule
+
