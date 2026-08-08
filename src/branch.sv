@@ -4,6 +4,7 @@ module branch import riscv_pkg::*; (
     input  logic [XLEN-1:0] alu_rd, e_rd, program_counter,
     input  logic [6:0] op,
     input  logic [2:0] funct3, 
+    input  logic rstn_i,
     output logic [XLEN-1:0] branch_rd
 );
 logic branch_taken;
@@ -25,7 +26,10 @@ always_comb begin
             branch_rd = program_counter - (-$signed(e_rd));         // hata olabilir
         else
             branch_rd = program_counter + e_rd;
-    end else begin
+    end 
+    else if (rstn_i==0)
+        branch_rd = INST_START;
+    else begin
         branch_rd = program_counter;
     end
 

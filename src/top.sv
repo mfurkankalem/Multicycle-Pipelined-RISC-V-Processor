@@ -23,17 +23,18 @@ logic en_f, en_d, en_e, en_m, en_w;
 logic [4:0] en_shift;
 
 always_ff @(posedge clk) begin
-    if (!rstn_i) begin
+    if (rstn_i) begin
+        if (en_shift == 5'b10000)  
         en_shift <= 5'b00001;
-    end else if (en_shift == 5'b10000) begin 
-        en_shift <= 5'b00001;
-    end else begin
+        else
         en_shift <= (en_shift << 1);
     end
+    else
+    en_shift <= 5'b00001;
 end
 
-assign en_f = en_shift[0]; 
-assign en_d = en_shift[1]; 
+assign en_f = en_shift[0];
+assign en_d = en_shift[1];
 assign en_e = en_shift[2]; 
 assign en_m = en_shift[3]; 
 assign en_w = en_shift[4]; 
@@ -82,7 +83,8 @@ ALU alu_0(.alu_a(alu_a), .alu_b(alu_b), .alu_cd(alu_cd_eo), .alu_rd(alu_rd));
 demux_2b demux_2 (.a1(alu_rd), .d_cd(ctrl_bits_eo[CTRLB_D2_MSB:CTRLB_D2_LSB]), 
 .rd1(demux2_out1), .rd2(demux2_out2), .rd3(demux2_out3), .rd4(empty));
 branch branch_0(.alu_rd(alu_rd), .e_rd(e_rd_eo), .program_counter(prog_cnt_eo),
-.op(inst_eo[6:0]), .funct3(inst_eo[14:12]), .branch_rd(branch_rd));
+.op(inst_eo[6:0]), .funct3(inst_eo[14:12]), .branch_rd(branch_rd),
+.rstn_i(rstn_i));
 
 
 ctrl_e ctrl_bits_mo;
@@ -113,7 +115,7 @@ mux_2b mux_2 (.a1(demux2_out2_wo), .a2(dm_rd_wo), .a3(prog_wo),
 .a4('0), .m_cd(ctrl_bits_wo[CTRLB_M2_MSB:CTRLB_M2_LSB]), .m_rd(r_wd3));
 
   always_comb begin
-    if (pc_wo>(INST_START-1))
+    if ((en_shift[4]) & (pc_wo>(INST_START-1)))
       update_o   = 1'b1;
     else
       update_o   = 0;
