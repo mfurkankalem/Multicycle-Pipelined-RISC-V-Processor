@@ -1,5 +1,4 @@
 obj_dir
 dump.vcd
 *.gtkw
-test
 dump.sv
