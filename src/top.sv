@@ -20,25 +20,9 @@ module top import riscv_pkg::*;
 );
 
 logic en_f, en_d, en_e, en_m, en_w;
-logic [4:0] en_shift;
 
-always_ff @(posedge clk) begin
-    if (rstn_i) begin
-        if (en_shift == 5'b10000)  
-        en_shift <= 5'b00001;
-        else
-        en_shift <= (en_shift << 1);
-    end
-    else
-    en_shift <= 5'b00001;
-end
-
-assign en_f = en_shift[0];
-assign en_d = en_shift[1];
-assign en_e = en_shift[2]; 
-assign en_m = en_shift[3]; 
-assign en_w = en_shift[4]; 
-
+hazard_unit hazard_unit_0(.clk(clk), .en_f(en_f), .en_d(en_d),
+.en_e(en_e), .en_m(en_m), .en_w(en_w), .rstn_i(rstn_i));
 
 logic [XLEN-1:0] pc_fi, pc_fo, im_rd, pc_p;
 
@@ -115,7 +99,7 @@ mux_2b mux_2 (.a1(demux2_out2_wo), .a2(dm_rd_wo), .a3(prog_wo),
 .a4('0), .m_cd(ctrl_bits_wo[CTRLB_M2_MSB:CTRLB_M2_LSB]), .m_rd(r_wd3));
 
   always_comb begin
-    if ((en_shift[4]) & (pc_wo>(INST_START-1)) & (inst_wo>0))
+    if ((en_w) & (pc_wo>(INST_START-1)) & (inst_wo>0))
       update_o   = 1'b1;
     else
       update_o   = 0;
