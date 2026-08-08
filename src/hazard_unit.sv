@@ -9,13 +9,13 @@ logic [4:0] en_shift;
 
     always_ff @(posedge clk) begin
         if (rstn_i) begin
-            if (en_shift == 5'b10000)  
-            en_shift <= 5'b00001;
+            if (en_shift == 5'b00000)  
+            en_shift <= 5'b00011;
             else
-            en_shift <= (en_shift << 1);
+            en_shift <= (en_shift << 1) | en_shift;
         end
         else
-        en_shift <= 5'b00001;
+        en_shift <= 5'b00000;
     end
 
     assign en_f = en_shift[0];

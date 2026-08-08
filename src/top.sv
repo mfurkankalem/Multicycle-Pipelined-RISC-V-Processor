@@ -27,7 +27,7 @@ hazard_unit hazard_unit_0(.clk(clk), .en_f(en_f), .en_d(en_d),
 logic [XLEN-1:0] pc_fi, pc_fo, im_rd, pc_p;
 
 clk_fetch clk_fetch_0(.clk(clk), .en_f(en_f), .rstn_i(rstn_i), 
-.pc_fi(branch_rd_wo), .pc_fo(pc_fo));
+.pc_fi(m4_o), .pc_fo(pc_fo));
 prog_cnt prog_cnt_0(.prog_cnt_i(pc_fo), .prog_cnt_o(pc_p));
 instruction_memory instruction_memory_0(.im_a(pc_fo), .im_rd(im_rd));
 
@@ -68,7 +68,7 @@ demux_2b demux_2 (.a1(alu_rd), .d_cd(ctrl_bits_eo[CTRLB_D2_MSB:CTRLB_D2_LSB]),
 .rd1(demux2_out1), .rd2(demux2_out2), .rd3(demux2_out3), .rd4(empty));
 branch branch_0(.alu_rd(alu_rd), .e_rd(e_rd_eo), .program_counter(prog_cnt_eo),
 .op(inst_eo[6:0]), .funct3(inst_eo[14:12]), .branch_rd(branch_rd),
-.rstn_i(rstn_i));
+.rstn_i(rstn_i), .m_cd4(m_cd4));
 
 
 ctrl_e ctrl_bits_mo;
@@ -97,6 +97,11 @@ clk_writeback clk_writeback_0 (.clk(clk), .en_w(en_w), .ctrl_bits_wi(ctrl_bits_m
 
 mux_2b mux_2 (.a1(demux2_out2_wo), .a2(dm_rd_wo), .a3(prog_wo), 
 .a4('0), .m_cd(ctrl_bits_wo[CTRLB_M2_MSB:CTRLB_M2_LSB]), .m_rd(r_wd3));
+
+logic m_cd4;
+logic [XLEN-1:0] m4_o;
+mux mux_4 (.a2(branch_rd_wo), .a1(pc_p), .m_cd(m_cd4),
+.m_rd(m4_o));
 
   always_comb begin
     if ((en_w) & (pc_wo>(INST_START-1)) & (inst_wo>0))
