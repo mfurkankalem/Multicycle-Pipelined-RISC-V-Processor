@@ -18,6 +18,9 @@ assign r_rd2 = register[r_a2];
   always @(posedge clk) begin
   
     if(r_cd==1) begin
+      if(r_a3==0)
+        register[0] <= 0;
+      else
       register[r_a3] <= r_wd3;
     end
 

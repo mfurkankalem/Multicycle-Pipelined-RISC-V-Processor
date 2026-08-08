@@ -115,15 +115,18 @@ mux_2b mux_2 (.a1(demux2_out2_wo), .a2(dm_rd_wo), .a3(prog_wo),
 .a4('0), .m_cd(ctrl_bits_wo[CTRLB_M2_MSB:CTRLB_M2_LSB]), .m_rd(r_wd3));
 
   always_comb begin
-    if ((en_shift[4]) & (pc_wo>(INST_START-1)))
+    if ((en_shift[4]) & (pc_wo>(INST_START-1)) & (inst_wo>0))
       update_o   = 1'b1;
     else
       update_o   = 0;
+    if ((inst_wo[6:0]==7'b1100011) | (inst_wo[6:0]==7'b0100011))
+      reg_addr_o = (inst_wo[19:15]);
+    else
+      reg_addr_o = (inst_wo[11:7]);
   end
 
   assign pc_o       = pc_wo;
   assign instr_o    = inst_wo;
-  assign reg_addr_o = (inst_wo[11:7]);
   assign reg_data_o = r_wd3;
   assign mem_addr_o = 32'h00000003;
   assign mem_data_o = 32'hFF000005;

@@ -22,7 +22,9 @@ module instruction_memory import riscv_pkg::*; #(
 
         while (!$feof(fd)) begin
             if ($fscanf(fd, "%h\n", data) == 1) begin
-                memory[addr] = data;
+                if (data != '0) begin
+                    memory[addr] = data;
+                end
                 addr = addr + 4;
             end
         end
