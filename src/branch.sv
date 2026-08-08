@@ -23,12 +23,10 @@ always_comb begin
 
     if (branch_taken && (op == 7'b1100011)) begin
         if ($signed(e_rd) < 0)
-            branch_rd = program_counter - (-$signed(e_rd));         // hata olabilir
+            branch_rd = program_counter - 4 + ($signed(e_rd)); // hata olabilir
         else
             branch_rd = program_counter + e_rd;
     end 
-    else if (rstn_i==0)
-        branch_rd = INST_START;
     else begin
         branch_rd = program_counter;
     end
