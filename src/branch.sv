@@ -11,6 +11,7 @@ module branch import riscv_pkg::*; (
 
 always_comb begin
     branch_taken = 1'b0;
+    if ((op == 7'b1100011) | (op == 7'b1100111) | (op == 7'b1101111)) begin
     case (funct3)
         3'b000: branch_taken = (alu_rd == 32'd0);        // BEQ
         3'b001: branch_taken = (alu_rd != 32'd0);        // BNE
@@ -20,8 +21,9 @@ always_comb begin
         3'b111: branch_taken = (alu_rd == 32'd0);        // BGEU
         default: branch_taken = 1'b0;
     endcase
+    end
 
-    if ((branch_taken && (op == 7'b1100011)) | (op == 7'b1100111) | (op == 7'b1101111)) begin
+    if (branch_taken) begin
         if ($signed(e_rd) < 0)
             branch_rd = program_counter - 4 + ($signed(e_rd)); // hata olabilir
         else
