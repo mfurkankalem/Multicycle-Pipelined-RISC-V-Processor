@@ -48,7 +48,7 @@ make clean   # remove build artifacts and waveform dump
 
 ## Testing
 
-The processor reads its program from `test.hex` (expected one directory above the project root, at `../test/test.hex`), a plain list of hex-encoded instruction words. Instruction addresses are not stored in the file — they're derived by the memory model, starting at `INST_START` and incrementing by 4 per line, matching the linear layout of the original `.text` section.
+The processor reads its program from `test.hex` (expected one directory above the project root, at `test/test.hex`), a plain list of hex-encoded instruction words. Instruction addresses are not stored in the file — they're derived by the memory model, starting at `INST_START` and incrementing by 4 per line, matching the linear layout of the original `.text` section.
 
 During simulation, the processor's execution trace (retired PC, instruction, register writes, memory accesses) is written to `model.log`. This output is compared against a reference trace; an exact match confirms the processor executes the test program correctly.
 
