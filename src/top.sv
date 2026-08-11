@@ -20,9 +20,13 @@ module top import riscv_pkg::*;
 );
 
 logic en_f, en_d, en_e, en_m, en_w;
+logic [1:0] forward_ae, forward_be; 
 
 hazard_unit hazard_unit_0(.clk(clk), .en_f(en_f), .en_d(en_d),
-.en_e(en_e), .en_m(en_m), .en_w(en_w), .rstn_i(rstn_i));
+.en_e(en_e), .en_m(en_m), .en_w(en_w), .rstn_i(rstn_i),
+.forward_ae(forward_ae), .forward_be(forward_be),
+.inst_eo(inst_eo), .inst_wo(inst_wo), .inst_mo(inst_mo),
+.ctrl_bits_mo(ctrl_bits_mo), .ctrl_bits_wo(ctrl_bits_wo));
 
 logic [XLEN-1:0] pc_fi, pc_fo, im_rd, pc_p;
 
@@ -33,7 +37,7 @@ instruction_memory instruction_memory_0(.im_a(pc_fo), .im_rd(im_rd));
 
 
 logic [XLEN-1:0] inst_do, pc_do, prog_cnt_do;
-logic [XLEN-1:0] r_rd1, r_rd2, r_wd3, e_rd;
+logic [XLEN-1:0] r_rd1, r_rd2, e_rd;
 ctrl_e ctrl_bits;
 logic [2:0] e_cd;
 logic [3:0] alu_cd;
@@ -41,14 +45,15 @@ logic [3:0] alu_cd;
 clk_decode clk_decode_0(.clk(clk), .inst_di(im_rd), .pc_di(pc_fo), .prog_cnt_di(pc_p),
 .inst_do(inst_do), .pc_do(pc_do), .prog_cnt_do(prog_cnt_do), .en_d(en_d));
 register r_0(.clk(clk), .r_cd(ctrl_bits_wo[CTRLB_R]), .r_a1(inst_do[19:15]), .r_a2(inst_do[24:20]), 
-.r_a3(inst_wo[11:7]), .r_wd3(r_wd3), .r_rd1(r_rd1), .r_rd2(r_rd2));
+.r_a3(inst_wo[11:7]), .r_wd3(mux2_out), .r_rd1(r_rd1), .r_rd2(r_rd2));
 extender e_0(.e_a(inst_do[31:7]), .e_cd(e_cd), .e_rd(e_rd));
 control c_0(.op(inst_do[6:0]), .funct3(inst_do[14:12]), .funct7(inst_do[31:25]),
 .e_cd(e_cd), .alu_cd(alu_cd), .ctrl_bits(ctrl_bits));
 
 
-logic [XLEN-1:0] r_rd1_eo, r_rd2_eo, e_rd_eo, inst_eo, pc_eo, prog_cnt_eo;
-ctrl_e ctrl_bits_eo; 
+logic [XLEN-1:0] r_rd1_eo, r_rd2_eo, e_rd_eo, inst_eo, pc_eo, prog_cnt_eo,
+forward_ae_o, forward_be_o;
+ctrl_e ctrl_bits_eo;
 logic [3:0] alu_cd_eo; 
 logic [XLEN-1:0] alu_a, alu_b, alu_rd, branch_rd;
 
@@ -58,8 +63,13 @@ clk_execute clk_execute_0 (.clk(clk), .en_e(en_e), .ctrl_bits_ei(ctrl_bits),
 .alu_cd_eo(alu_cd_eo), .r_rd1_eo(r_rd1_eo), .r_rd2_eo(r_rd2_eo), .e_rd_eo(e_rd_eo), 
 .inst_eo(inst_eo), .pc_eo(pc_eo), .prog_cnt_eo(prog_cnt_eo));
 
-mux mux_3 (.a1(pc_eo), .a2(r_rd1_eo), .m_cd(ctrl_bits_eo[CTRLB_M3]), .m_rd(alu_a));
-mux mux_1 (.a1(r_rd2_eo), .a2(e_rd_eo), .m_cd(ctrl_bits_eo[CTRLB_M1]), .m_rd(alu_b));
+mux_2b mux_forwardae_0 (.a1(r_rd1_eo), .a2(mux2_out), .a3(alu_rd_mo), .a4('0),
+.m_cd(forward_ae), .m_rd(forward_ae_o));
+mux_2b mux_forwardbe_0 (.a1(r_rd2_eo), .a2(mux2_out), .a3(alu_rd_mo), .a4('0),
+.m_cd(forward_be), .m_rd(forward_be_o));
+
+mux mux_3 (.a1(pc_eo), .a2(forward_ae_o), .m_cd(ctrl_bits_eo[CTRLB_M3]), .m_rd(alu_a));
+mux mux_1 (.a1(forward_be_o), .a2(e_rd_eo), .m_cd(ctrl_bits_eo[CTRLB_M1]), .m_rd(alu_b));
 ALU alu_0(.alu_a(alu_a), .alu_b(alu_b), .alu_cd(alu_cd_eo), .alu_rd(alu_rd));
 branch branch_0(.alu_rd(alu_rd), .e_rd(e_rd_eo), .program_counter(prog_cnt_eo),
 .op(inst_eo[6:0]), .funct3(inst_eo[14:12]), .branch_rd(branch_rd),
@@ -82,7 +92,7 @@ data_memory m_data(.clk(clk), .dm_cd(ctrl_bits_mo[CTRLB_DM]), .dm_a(alu_rd_mo),
 
 
 ctrl_e ctrl_bits_wo;
-logic [XLEN-1:0] branch_rd_wo, alu_rd_wo, dm_rd_wo, inst_wo, pc_wo, prog_wo;
+logic [XLEN-1:0] branch_rd_wo, alu_rd_wo, dm_rd_wo, inst_wo, pc_wo, prog_wo, mux2_out;
 
 clk_writeback clk_writeback_0 (.clk(clk), .en_w(en_w), .ctrl_bits_wi(ctrl_bits_mo), 
 .branch_rd_wi(branch_rd_mo), .dm_rd_wi(dm_rd), .alu_rd_wi(alu_rd_mo), 
@@ -91,7 +101,7 @@ clk_writeback clk_writeback_0 (.clk(clk), .en_w(en_w), .ctrl_bits_wi(ctrl_bits_m
 .inst_wo(inst_wo), .pc_wo(pc_wo), .prog_wo(prog_wo));
 
 mux_2b mux_2 (.a1(alu_rd_wo), .a2(dm_rd_wo), .a3(prog_wo), 
-.a4('0), .m_cd(ctrl_bits_wo[CTRLB_M2_MSB:CTRLB_M2_LSB]), .m_rd(r_wd3));
+.a4('0), .m_cd(ctrl_bits_wo[CTRLB_M2_MSB:CTRLB_M2_LSB]), .m_rd(mux2_out));
 
 logic m_cd4;
 logic [XLEN-1:0] m4_o;
@@ -111,7 +121,7 @@ mux mux_4 (.a2(branch_rd_wo), .a1(pc_p), .m_cd(m_cd4),
 
   assign pc_o       = pc_wo;
   assign instr_o    = inst_wo;
-  assign reg_data_o = r_wd3;
+  assign reg_data_o = mux2_out;
   assign mem_addr_o = 32'h00000003;
   assign mem_data_o = 32'hFF000005;
 

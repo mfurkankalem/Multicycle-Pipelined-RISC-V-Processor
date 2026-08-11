@@ -15,7 +15,7 @@ logic [XLEN-1:0] register [0:XLEN-1];
 assign r_rd1 = register[r_a1];
 assign r_rd2 = register[r_a2];
 
-  always @(posedge clk) begin
+  always @(negedge clk) begin
   
     if(r_cd==1) begin
       if(r_a3==0)
