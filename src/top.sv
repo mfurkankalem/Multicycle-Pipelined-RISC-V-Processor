@@ -19,14 +19,15 @@ module top import riscv_pkg::*;
     
 );
 
-logic en_f, en_d, en_e, en_m, en_w;
+logic en_f, en_d, en_e, en_m, en_w, branch_taken;
 logic [1:0] forward_ae, forward_be; 
 
 hazard_unit hazard_unit_0(.clk(clk), .en_f(en_f), .en_d(en_d),
 .en_e(en_e), .en_m(en_m), .en_w(en_w), .rstn_i(rstn_i),
 .forward_ae(forward_ae), .forward_be(forward_be),
 .inst_eo(inst_eo), .inst_wo(inst_wo), .inst_mo(inst_mo),
-.ctrl_bits_mo(ctrl_bits_mo), .ctrl_bits_wo(ctrl_bits_wo));
+.ctrl_bits_mo(ctrl_bits_mo), .ctrl_bits_wo(ctrl_bits_wo),
+.branch_taken(branch_taken));
 
 logic [XLEN-1:0] pc_fi, pc_fo, im_rd, pc_p;
 
@@ -73,7 +74,7 @@ mux mux_1 (.a1(forward_be_o), .a2(e_rd_eo), .m_cd(ctrl_bits_eo[CTRLB_M1]), .m_rd
 ALU alu_0(.alu_a(alu_a), .alu_b(alu_b), .alu_cd(alu_cd_eo), .alu_rd(alu_rd));
 branch branch_0(.alu_rd(alu_rd), .e_rd(e_rd_eo), .program_counter(prog_cnt_eo),
 .op(inst_eo[6:0]), .funct3(inst_eo[14:12]), .branch_rd(branch_rd),
-.rstn_i(rstn_i), .m_cd4(m_cd4));
+.rstn_i(rstn_i), .m_cd4(m_cd4), .branch_taken(branch_taken));
 
 
 ctrl_e ctrl_bits_mo;
@@ -81,11 +82,9 @@ logic [XLEN-1:0] inst_mo, pc_mo, prog_mo, dm_rd, alu_rd_mo,
 r_rd2_mo, branch_rd_mo;
 
 clk_memory clk_memory_0 (.clk(clk), .en_m(en_m), .ctrl_bits_mi(ctrl_bits_eo), 
-.alu_rd_mi(alu_rd),  .branch_rd_mi(branch_rd), 
-.r_rd2_mi(r_rd2_eo), .inst_mi(inst_eo), .pc_mi(pc_eo), 
+.alu_rd_mi(alu_rd), .r_rd2_mi(forward_be_o), .inst_mi(inst_eo), .pc_mi(pc_eo), 
 .prog_cnt_mi(prog_cnt_eo), .ctrl_bits_mo(ctrl_bits_mo), 
-.alu_rd_mo(alu_rd_mo), 
-.branch_rd_mo(branch_rd_mo), .r_rd2_mo(r_rd2_mo), 
+.alu_rd_mo(alu_rd_mo), .r_rd2_mo(r_rd2_mo), 
 .inst_mo(inst_mo), .pc_mo(pc_mo), .prog_mo(prog_mo));
 data_memory m_data(.clk(clk), .dm_cd(ctrl_bits_mo[CTRLB_DM]), .dm_a(alu_rd_mo), 
 .data_dm(data_o), .dm_wd (r_rd2_mo), .dm_rd(dm_rd));
@@ -95,9 +94,9 @@ ctrl_e ctrl_bits_wo;
 logic [XLEN-1:0] branch_rd_wo, alu_rd_wo, dm_rd_wo, inst_wo, pc_wo, prog_wo, mux2_out;
 
 clk_writeback clk_writeback_0 (.clk(clk), .en_w(en_w), .ctrl_bits_wi(ctrl_bits_mo), 
-.branch_rd_wi(branch_rd_mo), .dm_rd_wi(dm_rd), .alu_rd_wi(alu_rd_mo), 
+.dm_rd_wi(dm_rd), .alu_rd_wi(alu_rd_mo), 
 .inst_wi(inst_mo), .pc_wi(pc_mo), .prog_cnt_wi(prog_mo), .ctrl_bits_wo(ctrl_bits_wo), 
-.branch_rd_wo(branch_rd_wo), .dm_rd_wo(dm_rd_wo), .alu_rd_wo(alu_rd_wo), 
+.dm_rd_wo(dm_rd_wo), .alu_rd_wo(alu_rd_wo), 
 .inst_wo(inst_wo), .pc_wo(pc_wo), .prog_wo(prog_wo));
 
 mux_2b mux_2 (.a1(alu_rd_wo), .a2(dm_rd_wo), .a3(prog_wo), 
@@ -105,8 +104,7 @@ mux_2b mux_2 (.a1(alu_rd_wo), .a2(dm_rd_wo), .a3(prog_wo),
 
 logic m_cd4;
 logic [XLEN-1:0] m4_o;
-mux mux_4 (.a2(branch_rd_wo), .a1(pc_p), .m_cd(m_cd4),
-.m_rd(m4_o));
+mux mux_4 (.a2(branch_rd), .a1(pc_p), .m_cd(m_cd4), .m_rd(m4_o));
 
   always_comb begin
     if ((en_w) & (pc_wo>(INST_START-1)) & (inst_wo>0))

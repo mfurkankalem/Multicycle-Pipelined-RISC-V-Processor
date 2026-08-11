@@ -1,7 +1,7 @@
 
 
 module hazard_unit import riscv_pkg::*; (
-    input  logic clk, rstn_i,
+    input  logic clk, rstn_i, branch_taken,
     input logic [XLEN-1:0] inst_eo, inst_wo, inst_mo,
     input ctrl_e ctrl_bits_mo, ctrl_bits_wo,
     output logic en_f, en_d, en_e, en_m, en_w,
@@ -11,12 +11,8 @@ module hazard_unit import riscv_pkg::*; (
 logic [4:0] en_shift;
 
     always_ff @(posedge clk) begin
-        if (rstn_i) begin
-            if (en_shift == 5'b00000)  
-            en_shift <= 5'b00011;
-            else
-            en_shift <= (en_shift << 1) | en_shift;
-        end
+        if (rstn_i)
+        en_shift <= 5'b11111;
         else
         en_shift <= 5'b00000;
     end
