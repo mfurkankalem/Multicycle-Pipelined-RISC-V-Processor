@@ -1,6 +1,6 @@
 module tb ();
   logic [riscv_pkg::XLEN-1:0] addr;
-  logic [riscv_pkg::XLEN-1:0] data [0:riscv_pkg::XLEN-1];  
+  logic [7:0]                 data [0:riscv_pkg::XLEN-1];  
   logic [riscv_pkg::XLEN-1:0] pc;
   logic [riscv_pkg::XLEN-1:0] instr;
   logic [                4:0] reg_addr;
@@ -54,8 +54,9 @@ module tb ();
     rstn = 1;
     #20000;
     for (int i = 0; i < riscv_pkg::XLEN; i++) begin
-      addr = i;
-      $display("data @ mem[0x%8h] = %8h", addr, data[addr]);
+      addr = i*4;
+      $display("data @ mem[0x%8h] = %2h%2h%2h%2h", addr, data[addr],
+      data[addr+1], data[addr+2], data[addr+3]);
     end
     $finish;
   end

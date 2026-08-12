@@ -11,10 +11,10 @@ module top import riscv_pkg::*;
     output logic             update_o,    // log update signal
     output logic  [XLEN-1:0] pc_o,        // log program counter
     output logic  [XLEN-1:0] instr_o,     // log instruction
-    output logic  [     4:0] reg_addr_o,  // log register address
+    output logic  [4:0]      reg_addr_o,  // log register address
     output logic  [XLEN-1:0] reg_data_o,  // log register data
     output logic  [XLEN-1:0] mem_addr_o,  // retired memory address
-    output logic  [XLEN-1:0] data_o [0:XLEN-1], // data memory write
+    output logic  [7:0]      data_o  [0:XLEN-1], // data memory write
     output logic  [XLEN-1:0] mem_data_o   // retired memory data              //imem için kullanılacak
     
 );
