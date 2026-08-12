@@ -66,12 +66,14 @@ package riscv_pkg;
       CTRL_NONE        = 'b0_1_00_1_0
   } ctrl_e;
 
-  typedef enum logic [1:0] {
-      PC_NONE   = 2'b00,   
-      PC_JAL    = 2'b01,   
-      PC_JALR   = 2'b10,
-      PC_BRANCH = 2'b11 
-  } pc_e;
+  typedef enum logic [2:0] {
+      P_B  = 3'b000,     // load-read byte
+      P_H  = 3'b001,     // load-read half    
+      P_W  = 3'b010,     // load-read word
+      P_BU = 3'b100,     // load byte unsigned
+      P_HU = 3'b101      // load half unsigned
+  } datam_e;
+
 
   // ----------------------
   // Import cva6 config from cva6_config_pkg

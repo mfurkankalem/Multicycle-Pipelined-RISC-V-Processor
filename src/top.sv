@@ -87,7 +87,8 @@ clk_memory clk_memory_0 (.clk(clk), .en_m(en_m), .ctrl_bits_mi(ctrl_bits_eo),
 .alu_rd_mo(alu_rd_mo), .r_rd2_mo(r_rd2_mo), 
 .inst_mo(inst_mo), .pc_mo(pc_mo), .prog_mo(prog_mo));
 data_memory m_data(.clk(clk), .dm_cd(ctrl_bits_mo[CTRLB_DM]), .dm_a(alu_rd_mo), 
-.data_dm(data_o), .dm_wd (r_rd2_mo), .dm_rd(dm_rd));
+.data_dm(data_o), .dm_wd (r_rd2_mo), .dm_rd(dm_rd), .op(inst_mo[6:0]),
+.funct3(inst_mo[14:12]));
 
 
 ctrl_e ctrl_bits_wo;

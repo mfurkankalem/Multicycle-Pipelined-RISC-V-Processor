@@ -15,8 +15,7 @@ logic [11:0] casecode_b_extension;
 assign casecode_b_extension = {funct7, rs2};
 
     localparam logic [16:0]
-        P_   = 17'b0111111???????????,         
-        
+
         // R-type
         P_ADD   = 17'b0110011_000_0000000,
         P_SUB   = 17'b0110011_000_0100000,
@@ -184,12 +183,31 @@ assign casecode_b_extension = {funct7, rs2};
             end
 
             // Load
+            P_LB: begin
+                alu_cd = ALU_ADD;
+                e_cd   = IMM_I;
+                ctrl_bits = CTRL_LOAD;
+            end
+            P_LH: begin
+                alu_cd = ALU_ADD;
+                e_cd   = IMM_I;
+                ctrl_bits = CTRL_LOAD;
+            end
             P_LW: begin
                 alu_cd = ALU_ADD;
                 e_cd   = IMM_I;
                 ctrl_bits = CTRL_LOAD;
             end
-                                            //cache
+            P_LBU: begin
+                alu_cd = ALU_ADD;
+                e_cd   = IMM_I;
+                ctrl_bits = CTRL_LOAD;
+            end
+            P_LHU: begin
+                alu_cd = ALU_ADD;
+                e_cd   = IMM_I;
+                ctrl_bits = CTRL_LOAD;
+            end
 
             // Store
             P_SW: begin
@@ -277,11 +295,6 @@ assign casecode_b_extension = {funct7, rs2};
             end
 
             // Default
-            P_: begin
-                alu_cd    = ALU_NONE;
-                e_cd      = IMM_NONE;
-                ctrl_bits = CTRL_NONE;
-            end
             default: begin
                 alu_cd = ALU_NONE;
                 e_cd   = IMM_NONE;
