@@ -1,36 +1,22 @@
-module instruction_memory import riscv_pkg::*; #(
-    parameter string InitFile = "test/test.hex"
-) (
-    input  logic [XLEN-1:0] im_a,
-    output logic [XLEN-1:0] im_rd
+//will be changed later
+
+
+module instruction_memory import riscv_pkg::*; (
+    input logic [XLEN-1:0] im_a,
+    output logic [XLEN-1:0] im_rd 
 );
 
-    logic [XLEN-1:0] memory [logic [XLEN-1:0]];
+    logic [XLEN-1:0]  inst [0:XLEN-1];    
+    logic [XLEN-1:0] result;              
+    
+assign inst[0] = 32'h60001093; // clz  x1, x0
+    assign inst[1] = 32'h7d000113; // addi x2, x0, 2000
+    assign inst[2] = 32'h60011193; // clz  x3, x2
+    assign inst[3] = 32'hffe00213; // addi x4, x0, -2
+    assign inst[4] = 32'h60021293; // clz  x5, x4
 
-    initial begin
-        integer fd;
-        logic [XLEN-1:0] data;
-        logic [XLEN-1:0] addr;
+    assign result = (im_a - INST_START)>>2;
 
-        fd = $fopen(InitFile, "r");
-        if (fd == 0) begin
-            $display("ERROR: %s not found", InitFile);
-            $finish;
-        end
-
-        addr = INST_START;
-
-        while (!$feof(fd)) begin
-            if ($fscanf(fd, "%h\n", data) == 1) begin
-                if (data != '0) begin
-                    memory[addr] = data;
-                end
-                addr = addr + 4;
-            end
-        end
-        $fclose(fd);
-    end
-
-    assign im_rd = memory.exists(im_a) ? memory[im_a] : '0;
+    assign im_rd = inst[result];
 
 endmodule

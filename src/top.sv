@@ -49,7 +49,7 @@ register r_0(.clk(clk), .r_cd(ctrl_bits_wo[CTRLB_R]), .r_a1(inst_do[19:15]), .r_
 .r_a3(inst_wo[11:7]), .r_wd3(mux2_out), .r_rd1(r_rd1), .r_rd2(r_rd2));
 extender e_0(.e_a(inst_do[31:7]), .e_cd(e_cd), .e_rd(e_rd));
 control c_0(.op(inst_do[6:0]), .funct3(inst_do[14:12]), .funct7(inst_do[31:25]),
-.e_cd(e_cd), .alu_cd(alu_cd), .ctrl_bits(ctrl_bits));
+.e_cd(e_cd), .alu_cd(alu_cd), .ctrl_bits(ctrl_bits), .rs2(inst_do[24:20]));
 
 
 logic [XLEN-1:0] r_rd1_eo, r_rd2_eo, e_rd_eo, inst_eo, pc_eo, prog_cnt_eo,

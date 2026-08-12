@@ -4,12 +4,15 @@ module control import riscv_pkg::*; (
     input  logic [6:0] op,
     input  logic [2:0] funct3, 
     input logic [6:0] funct7,
+    input logic [4:0] rs2,
     output  logic [2:0] e_cd,
     output  logic [3:0] alu_cd,
     output ctrl_e ctrl_bits
 );
 logic [16:0] casecode;
 assign casecode = {op, funct3, funct7};
+logic [11:0] casecode_b_extension;
+assign casecode_b_extension = {funct7, rs2};
 
     localparam logic [16:0]
         P_   = 17'b0111111???????????,         
@@ -38,15 +41,15 @@ assign casecode = {op, funct3, funct7};
         P_SRAI  = 17'b0010011_101_0100000,
 
         // Load
-        P_LB    = 17'b0000011_000_???????,    
-        P_LH    = 17'b0000011_001_???????,     
+        P_LB    = 17'b0000011_000_???????,     //cache
+        P_LH    = 17'b0000011_001_???????,     //cache
         P_LW    = 17'b0000011_010_???????,
-        P_LBU   = 17'b0000011_100_???????,     
-        P_LHU   = 17'b0000011_101_???????,     
+        P_LBU   = 17'b0000011_100_???????,     //cache
+        P_LHU   = 17'b0000011_101_???????,     //cache
 
         // Store
-        P_SB    = 17'b0100011_000_???????,     
-        P_SH    = 17'b0100011_001_???????,     
+        P_SB    = 17'b0100011_000_???????,     //cache
+        P_SH    = 17'b0100011_001_???????,     //cache
         P_SW    = 17'b0100011_010_???????,
 
         // Branch
@@ -67,8 +70,16 @@ assign casecode = {op, funct3, funct7};
 
         // Misc-mem / system
         P_FENCE = 17'b0001111_000_???????,
-        P_SYS   = 17'b1110011_000_0000000;  
+        P_SYS   = 17'b1110011_000_0000000,  
         
+        // B-extension
+        P_EXT_B = 17'b0010011_001_0110000; 
+ 
+    localparam logic [11:0]
+        P_CLZ   = 12'b011000000000,
+        P_CTZ   = 12'b011000000001,
+        P_CPOP  = 12'b011000000010;  
+
 
 
     always_comb begin
@@ -243,13 +254,27 @@ assign casecode = {op, funct3, funct7};
                 e_cd      = IMM_U;
                 ctrl_bits = CTRL_AUIPC;
             end
+
+            // B-extension
+            P_EXT_B: begin
+            casez (casecode_b_extension)
+                P_CLZ: begin
+                alu_cd    = ALU_CLZ;
+                e_cd      = IMM_NONE;
+                ctrl_bits = CTRL_REG_WRITE;
+
+                end
+
+
+            endcase
+            end
+
+            // Default
             P_: begin
                 alu_cd    = ALU_NONE;
                 e_cd      = IMM_NONE;
                 ctrl_bits = CTRL_NONE;
             end
-
-            // Default
             default: begin
                 alu_cd = ALU_NONE;
                 e_cd   = IMM_NONE;

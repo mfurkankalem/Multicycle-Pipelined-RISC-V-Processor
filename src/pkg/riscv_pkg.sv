@@ -19,18 +19,13 @@ package riscv_pkg;
 
   localparam INST_START    = 32'h80000000;
 
-  localparam CTRLB_LEN     = 4'd11;
-  localparam CTRLB_PC_MSB  = 4'd10;
-  localparam CTRLB_PC_LSB  = 4'd9;
-  localparam CTRLB_R       = 4'd8;
-  localparam CTRLB_M1      = 4'd7;
-  localparam CTRLB_M2_MSB  = 4'd6;
-  localparam CTRLB_M2_LSB  = 4'd5;
-  localparam CTRLB_M3      = 4'd4;
-  localparam CTRLB_D1      = 4'd3;
-  localparam CTRLB_D2_MSB  = 4'd2;
-  localparam CTRLB_D2_LSB  = 4'd1;
-  localparam CTRLB_DM      = 4'd0;
+  localparam CTRLB_LEN     = 3'd6;
+  localparam CTRLB_R       = 3'd5;
+  localparam CTRLB_M1      = 3'd4;
+  localparam CTRLB_M2_MSB  = 3'd3;
+  localparam CTRLB_M2_LSB  = 3'd2;
+  localparam CTRLB_M3      = 3'd1;
+  localparam CTRLB_DM      = 3'd0;
 
   typedef enum logic [3:0] {
       ALU_ADD   = 4'b0000,
@@ -43,6 +38,9 @@ package riscv_pkg;
       ALU_SRA   = 4'b0111,
       ALU_SLT   = 4'b1000,
       ALU_SLTU  = 4'b1001,
+      ALU_CLZ   = 4'b1010,
+      ALU_CTZ   = 4'b1011,
+      ALU_CPOP  = 4'b1100,
       ALU_NONE  = 4'b1111
   } alu_op_e;
 
@@ -55,17 +53,17 @@ package riscv_pkg;
       IMM_B    = 3'b101    // B-type operations
   } imm_src_e;
 
-  //pc_cd, r_cd, m_cd1, m_cd2, m_cd3, d_cd1, d_cd2, dm_cd
+  //r_cd, m_cd1, m_cd2, m_cd3, dm_cd
   typedef enum logic [CTRLB_LEN-1:0] {
-      CTRL_REG_WRITE   = 'b00_1_0_00_1_0_01_0,   // add, sub
-      CTRL_REG_WRITE_I = 'b00_1_1_00_1_0_01_0,   // addi
-      CTRL_JUMP_LINK   = 'b01_1_0_10_1_0_01_0,   // jal
-      CTRL_JALR        = 'b10_1_1_10_1_0_10_0,   // jalr
-      CTRL_BRANCH      = 'b11_0_0_00_1_0_11_0,   // branch
-      CTRL_AUIPC       = 'b00_1_1_00_0_0_01_0,   // auipc 
-      CTRL_LOAD        = 'b00_1_1_01_1_0_00_0,   // lw
-      CTRL_STORE       = 'b00_0_1_00_1_1_00_1,   // sw
-      CTRL_NONE        = 'b00_0_1_00_1_0_01_0
+      CTRL_REG_WRITE   = 'b1_0_00_1_0,   // add, sub
+      CTRL_REG_WRITE_I = 'b1_1_00_1_0,   // addi
+      CTRL_JUMP_LINK   = 'b1_0_10_1_0,   // jal
+      CTRL_JALR        = 'b1_1_10_1_0,   // jalr
+      CTRL_BRANCH      = 'b0_0_00_1_0,   // branch
+      CTRL_AUIPC       = 'b1_1_00_0_0,   // auipc 
+      CTRL_LOAD        = 'b1_1_01_1_0,   // lw
+      CTRL_STORE       = 'b0_1_00_1_1,   // sw
+      CTRL_NONE        = 'b0_1_00_1_0
   } ctrl_e;
 
   typedef enum logic [1:0] {
