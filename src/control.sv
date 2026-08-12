@@ -259,13 +259,20 @@ assign casecode_b_extension = {funct7, rs2};
             P_EXT_B: begin
             casez (casecode_b_extension)
                 P_CLZ: begin
-                alu_cd    = ALU_CLZ;
-                e_cd      = IMM_NONE;
-                ctrl_bits = CTRL_REG_WRITE;
-
+                    alu_cd    = ALU_CLZ;
+                    e_cd      = IMM_NONE;
+                    ctrl_bits = CTRL_REG_WRITE;
                 end
-
-
+                P_CTZ: begin
+                    alu_cd    = ALU_CTZ;
+                    e_cd      = IMM_NONE;
+                    ctrl_bits = CTRL_REG_WRITE;
+                end
+                P_CPOP: begin
+                    alu_cd    = ALU_CPOP;
+                    e_cd      = IMM_NONE;
+                    ctrl_bits = CTRL_REG_WRITE;
+                end
             endcase
             end
 

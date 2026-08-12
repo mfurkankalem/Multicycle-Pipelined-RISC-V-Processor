@@ -5,7 +5,6 @@ module ALU import riscv_pkg::*; (
     input  logic [3:0] alu_cd, 
     output logic [XLEN-1:0] alu_rd
 );
-logic found;
     always_comb begin
         case (alu_cd)
             ALU_ADD:    alu_rd = alu_a + alu_b;
@@ -24,7 +23,17 @@ logic found;
                                 alu_rd = XLEN-1 - i;
                                 break;
                         end end end
-                        
+            ALU_CTZ:    begin alu_rd = XLEN;
+                        for (int i = 0; i <= XLEN-1; i++) begin
+                            if (alu_a[i]) begin
+                                alu_rd = i;
+                                break;
+                        end end end
+            ALU_CPOP:   begin alu_rd = 0;
+                        for (int i = XLEN-1; i >= 0; i--) begin
+                            if (alu_a[i]) begin
+                                alu_rd = alu_rd + 1;
+                        end end end
             default:    alu_rd = 'x;
         endcase
     end
