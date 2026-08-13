@@ -47,8 +47,8 @@ assign casecode_b_extension = {funct7, rs2};
         P_LHU   = 17'b0000011_101_???????,     
 
         // Store
-        P_SB    = 17'b0100011_000_???????,     //cache
-        P_SH    = 17'b0100011_001_???????,     //cache
+        P_SB    = 17'b0100011_000_???????,
+        P_SH    = 17'b0100011_001_???????,
         P_SW    = 17'b0100011_010_???????,
 
         // Branch
@@ -210,12 +210,21 @@ assign casecode_b_extension = {funct7, rs2};
             end
 
             // Store
+            P_SB: begin
+                alu_cd = ALU_ADD;
+                e_cd   = IMM_S;
+                ctrl_bits = CTRL_STORE;
+            end
+            P_SH: begin
+                alu_cd = ALU_ADD;
+                e_cd   = IMM_S;
+                ctrl_bits = CTRL_STORE;
+            end
             P_SW: begin
                 alu_cd = ALU_ADD;
                 e_cd   = IMM_S;
                 ctrl_bits = CTRL_STORE;
             end
-                                            //cache
             
             // Branch
             P_BEQ: begin

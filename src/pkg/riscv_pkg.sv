@@ -19,13 +19,13 @@ package riscv_pkg;
 
   localparam INST_START    = 32'h80000000;
 
-  localparam CTRLB_LEN     = 3'd6;
-  localparam CTRLB_R       = 3'd5;
-  localparam CTRLB_M1      = 3'd4;
-  localparam CTRLB_M2_MSB  = 3'd3;
-  localparam CTRLB_M2_LSB  = 3'd2;
-  localparam CTRLB_M3      = 3'd1;
-  localparam CTRLB_DM      = 3'd0;
+  localparam CTRLB_LEN     = 3'd5;
+  localparam CTRLB_R       = 3'd4;
+  localparam CTRLB_M1      = 3'd3;
+  localparam CTRLB_M2_MSB  = 3'd2;
+  localparam CTRLB_M2_LSB  = 3'd1;
+  localparam CTRLB_M3      = 3'd0;
+  
 
   typedef enum logic [3:0] {
       ALU_ADD   = 4'b0000,
@@ -53,17 +53,17 @@ package riscv_pkg;
       IMM_B    = 3'b101    // B-type operations
   } imm_src_e;
 
-  //r_cd, m_cd1, m_cd2, m_cd3, dm_cd
+  //r_cd, m_cd1, m_cd2, m_cd3
   typedef enum logic [CTRLB_LEN-1:0] {
-      CTRL_REG_WRITE   = 'b1_0_00_1_0,   // add, sub
-      CTRL_REG_WRITE_I = 'b1_1_00_1_0,   // addi
-      CTRL_JUMP_LINK   = 'b1_0_10_1_0,   // jal
-      CTRL_JALR        = 'b1_1_10_1_0,   // jalr
-      CTRL_BRANCH      = 'b0_0_00_1_0,   // branch
-      CTRL_AUIPC       = 'b1_1_00_0_0,   // auipc 
-      CTRL_LOAD        = 'b1_1_01_1_0,   // lw
-      CTRL_STORE       = 'b0_1_00_1_1,   // sw
-      CTRL_NONE        = 'b0_1_00_1_0
+      CTRL_REG_WRITE   = 'b1_0_00_1,   // add, sub
+      CTRL_REG_WRITE_I = 'b1_1_00_1,   // addi
+      CTRL_JUMP_LINK   = 'b1_0_10_1,   // jal
+      CTRL_JALR        = 'b1_1_10_1,   // jalr
+      CTRL_BRANCH      = 'b0_0_00_1,   // branch
+      CTRL_AUIPC       = 'b1_1_00_0,   // auipc 
+      CTRL_LOAD        = 'b1_1_01_1,   // lw
+      CTRL_STORE       = 'b0_1_00_1,   // sw
+      CTRL_NONE        = 'b0_0_11_1
   } ctrl_e;
 
   typedef enum logic [2:0] {
