@@ -1,4 +1,4 @@
-A RISC-V processor implemented in SystemVerilog, verified with Verilator. The design fetches instructions from a hex memory image, executes the RV32I instruction set, and logs its execution trace for verification against a reference model.
+A RISC-V processor implemented in SystemVerilog, verified with Verilator. The design fetches instructions from a hex memory image, executes the RV32I instruction set along with the CLZ, CTZ, and CPOP instructions from the B-extension and logs its execution trace for verification against a reference model.
 
 ## Architecture
 
@@ -11,7 +11,7 @@ Key modules:
 | `instruction_memory` | Loads program from a hex file into sparse memory, combinationally serves fetch requests |
 | `register` | 32-entry register file, synchronous write / combinational read |
 | `control` | Decodes opcode/funct3/funct7 into ALU and datapath control signals |
-| `ALU` | Executes arithmetic/logic operations |
+| `ALU` | Executes arithmetic/logic operations, including B-extension CLZ/CTZ/CPOP |
 | `extender` | Sign-extends immediates per instruction format (I/S/B/U/J) |
 | `branch` | Resolves branch/jump targets and outcomes |
 | `data_memory` | Load/store memory access |
