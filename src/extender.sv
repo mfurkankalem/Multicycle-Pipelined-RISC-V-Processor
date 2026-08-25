@@ -2,12 +2,12 @@
 
 module extender import riscv_pkg::*; (
     input  logic [24:0] e_a,
-    input  logic [2:0] e_cd, 
+    input  imm_src_e      e_cd, 
     output logic [XLEN-1:0] e_rd
 );
 
   always_comb begin
-      case (e_cd)
+      casez (e_cd)
           IMM_I:   e_rd = {{20{e_a[24]}}, e_a[24:13]};
           IMM_J:   e_rd = {{11{e_a[24]}}, e_a[24], e_a[12:5], e_a[13], e_a[23:14], 1'b0};
           IMM_U:   e_rd = {e_a[24:5], 12'b0};
